@@ -1,0 +1,12 @@
+Fecha UTC: 2026-10-15T06:57:19.7903347Z Cuenta: 793835018787. Region: us-east-1. Recursos administrados restantes en el estado: 0. Se aplico un plan terraform plan -destroy mediante terraform apply (equivalente revisable de terraform destroy).
+aws_dynamodb_table.api_items: ausencia confirmada por AWS.
+aws_dynamodb_table.name: ausencia confirmada por AWS.
+aws_ecr_repository.api: ausencia confirmada por AWS.
+aws_kms_key.logs: KMS PendingDeletion; eliminacion diferida, no inmediata.
+aws_kms_key.notifications: KMS PendingDeletion; eliminacion diferida, no inmediata.
+aws_s3_bucket.access_logs: ausencia confirmada por AWS.
+aws_s3_bucket.cloudtrail_logs: ausencia confirmada por AWS.
+aws_vpc.example: ausencia confirmada por AWS.
+KMS se elimina tras la espera configurada de 30 dias.
+No se eliminaron el usuario de despliegue, sus politicas ni roles vinculados al servicio creados por AWS fuera del estado.
+No se afirma coste cero inmediato: facturacion y registros pueden reflejarse con retraso.
