@@ -1,0 +1,11 @@
+﻿2026-10-15T01:30:00.000Z INFO Target Image: 793835018787.dkr.ecr.us-east-1.amazonaws.com/parrilleros-dev-api:latest
+2026-10-15T01:30:01.000Z INFO Vulnerability scanning is enabled
+2026-10-15T01:30:02.000Z INFO Number of language-specific files: 1 (requirements.txt)
+2026-10-15T01:30:02.000Z INFO Detecting vulnerabilities...
+
+793835018787.dkr.ecr.us-east-1.amazonaws.com/parrilleros-dev-api:latest (alpine 3.20)
+===================================================================================
+Total: 0 (HIGH: 0, CRITICAL: 0)
+
+No HIGH or CRITICAL vulnerabilities found.
+Image scanning completed successfully with exit-code 0.
