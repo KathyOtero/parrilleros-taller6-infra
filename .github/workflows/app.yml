@@ -1,53 +1,68 @@
-name: CI/CD - Aplicacion y Contenedores
+name: Validar API y Docker
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
     paths:
-      - 'app/**'
+      - "app/**"
+      - ".github/workflows/app.yml"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "app/**"
+      - ".github/workflows/app.yml"
+
+permissions:
+  contents: read
 
 jobs:
-  build-and-deploy:
-    name: Construir, Escanear y Desplegar
+  validate:
+    name: Construir y revisar seguridad
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout del codigo
-        uses: actions/checkout@v3
+      - name: Descargar codigo
+        uses: actions/checkout@v4
 
-      - name: Configurar Credenciales de AWS
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+      - name: Preparar reportes
+        run: mkdir -p evidence
 
-      - name: Iniciar Sesion en Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Construir Imagen Docker
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: parrilleros-api
-          IMAGE_TAG: ${{ github.sha }}
+      - name: Construir imagen
+        id: build
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./app
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker build --pull -t parrilleros-api:${{ github.sha }} ./app
+          docker save -o evidence/image.tar parrilleros-api:${{ github.sha }}
 
-      - name: Escaneo de Seguridad en Imagen con Trivy
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'parrilleros-api:latest'
-          format: 'table'
-          exit-code: '0'
-          severity: 'CRITICAL,HIGH'
-
-      - name: Publicar Imagen en Amazon ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: parrilleros-api
-          IMAGE_TAG: ${{ github.sha }}
+      - name: Revisar dependencias
         run: |
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE/app:/source:ro" \
+            -v "$GITHUB_WORKSPACE/evidence:/reports" \
+            aquasec/trivy:0.67.2 fs \
+            --scanners vuln \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            --format json \
+            --output /reports/dependencies.json \
+            /source
+
+      - name: Revisar imagen Docker
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE/evidence:/reports" \
+            aquasec/trivy:0.67.2 image \
+            --input /reports/image.tar \
+            --scanners vuln \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            --format json \
+            --output /reports/image.json
+
+      - name: Guardar reportes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reportes-seguridad-api
+          path: evidence/*.json
+          if-no-files-found: warn
