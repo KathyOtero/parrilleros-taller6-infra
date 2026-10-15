@@ -12,7 +12,7 @@ resource "aws_vpc" "example" {
 }
 
 resource "aws_default_security_group" "example" {
-  vpc_id = aws_vpc.example.id
+  vpc_id  = aws_vpc.example.id
   ingress = []
   egress  = []
 }

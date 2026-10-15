@@ -166,8 +166,8 @@ resource "aws_cloudtrail" "empleados" {
   include_global_service_events = true
   is_multi_region_trail         = true
   kms_key_id                    = aws_kms_key.logs.arn
-  cloud_watch_logs_group_arn     = "${aws_cloudwatch_log_group.cloudtrail.arn}:*"
-  cloud_watch_logs_role_arn      = aws_iam_role.cloudtrail_logs.arn
+  cloud_watch_logs_group_arn    = "${aws_cloudwatch_log_group.cloudtrail.arn}:*"
+  cloud_watch_logs_role_arn     = aws_iam_role.cloudtrail_logs.arn
   sns_topic_name                = aws_sns_topic.cloudtrail.name
 
   depends_on = [
