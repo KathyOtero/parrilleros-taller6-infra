@@ -13,6 +13,11 @@ locals {
 
 data "aws_availability_zones" "compute" {
   state = "available"
+
+  filter {
+    name   = "zone-name"
+    values = ["${var.aws_region}a"]
+  }
 }
 
 resource "aws_ecr_repository" "api" {
