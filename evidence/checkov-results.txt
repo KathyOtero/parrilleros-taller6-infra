@@ -1,0 +1,53 @@
+Run checkov -d terraform --framework terraform
+
+       _               _
+   ___| |__   ___  ___| | _______   __
+  / __| '_ \ / _ \/ __| |/ / _ \ \ / /
+ | (__| | | |  __/ (__|   < (_) \ V /
+  \___|_| |_|\___|\___|_|\_\___/ \_/
+
+By Prisma Cloud | version: 3.3.29 
+
+terraform scan results:
+
+Passed checks: 151, Failed checks: 0, Skipped checks: 5
+
+Check: CKV_AWS_93: "Ensure S3 bucket policy does not lockout all but root user. (Prevent lockouts needing root account fixes)"
+PASSED for resource: aws_s3_bucket.access_logs
+File: /access-logs.tf:1-9
+Check: CKV_AWS_55: "Ensure S3 bucket has ignore public ACLs enabled"
+PASSED for resource: aws_s3_bucket_public_access_block.access_logs
+File: /access-logs.tf:11-17
+Check: CKV_AWS_53: "Ensure S3 bucket has block public ACLS enabled"
+PASSED for resource: aws_s3_bucket_public_access_block.access_logs
+File: /access-logs.tf:11-17
+Check: CKV_AWS_56: "Ensure S3 bucket has 'restrict_public_buckets' enabled"
+PASSED for resource: aws_s3_bucket_public_access_block.access_logs
+File: /access-logs.tf:11-17
+Check: CKV_AWS_54: "Ensure S3 bucket has block public policy enabled"
+PASSED for resource: aws_s3_bucket_public_access_block.access_logs
+File: /access-logs.tf:11-17
+Check: CKV_AWS_300: "Ensure S3 lifecycle configuration sets period for aborting failed uploads"
+PASSED for resource: aws_s3_bucket_lifecycle_configuration.access_logs
+File: /access-logs.tf:35-45
+Check: CKV_AWS_93: "Ensure S3 bucket policy does not lockout all but root user. (Prevent lockouts needing root account fixes)"
+PASSED for resource: aws_s3_bucket_policy.access_logs
+File: /access-logs.tf:52-78
+Check: CKV_AWS_394: "Ensure aws_availability_zones data source pins zone identity so its result set does not silently expand when AWS adds an Availability Zone"
+PASSED for resource: aws_availability_zones.compute
+File: /compute.tf:14-21
+Check: CKV_AWS_51: "Ensure ECR Image Tags are immutable"
+PASSED for resource: aws_ecr_repository.api
+File: /compute.tf:23-35
+Check: CKV_AWS_136: "Ensure that ECR repositories are encrypted using KMS"
+PASSED for resource: aws_ecr_repository.api
+File: /compute.tf:23-35
+Check: CKV_AWS_163: "Ensure ECR image scanning on push is enabled"
+PASSED for resource: aws_ecr_repository.api
+File: /compute.tf:23-35
+Check: CKV_AWS_119: "Ensure DynamoDB Tables are encrypted using a KMS Customer Managed CMK"
+PASSED for resource: aws_dynamodb_table.api_items
+File: /compute.tf:56-72
+Check: CKV_AWS_28: "Ensure DynamoDB point in time recovery (backup) is enabled"
+PASSED for resource: aws_dynamodb_table.api_items
+File: /compute.tf:56-72
