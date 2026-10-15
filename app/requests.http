@@ -1,0 +1,28 @@
+### Cambia la URL por la de App Runner al probar en la nube
+@baseUrl = http://localhost:8080
+
+### Healthcheck
+GET {{baseUrl}}/health
+
+### Crear elemento
+POST {{baseUrl}}/items
+Content-Type: application/json
+
+{
+  "name": "Chorizo santarrosano",
+  "description": "Elemento de prueba de Los Parrilleros"
+}
+
+### Listar elementos
+GET {{baseUrl}}/items
+
+### Listar con límite
+GET {{baseUrl}}/items?limit=5
+
+### Validación: nombre vacío -> 422
+POST {{baseUrl}}/items
+Content-Type: application/json
+
+{
+  "name": ""
+}
