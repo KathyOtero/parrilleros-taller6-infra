@@ -1,56 +1,53 @@
-name: CI/CD - Infraestructura (Terraform)
+name: Validar infraestructura
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
     paths:
-      - 'terraform/**'
+      - "terraform/**"
+      - ".github/workflows/infra.yml"
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
     paths:
-      - 'terraform/**'
+      - "terraform/**"
+      - ".github/workflows/infra.yml"
+
+permissions:
+  contents: read
 
 jobs:
-  terraform:
-    name: Validar y Aplicar Infraestructura
+  validate:
+    name: Terraform y Checkov
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout del codigo
-        uses: actions/checkout@v3
+      - name: Descargar codigo
+        uses: actions/checkout@v4
 
       - name: Configurar Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.5.0
+          terraform_version: "1.5.0"
 
-      - name: Formato de Terraform
-        run: terraform fmt -check
-        working-directory: ./terraform
+      - name: Revisar formato
+        run: terraform fmt -check -recursive
+        working-directory: terraform
 
-      - name: Inicializar Terraform
-        run: terraform init
-        working-directory: ./terraform
+      - name: Inicializar sin backend
+        run: terraform init -backend=false
+        working-directory: terraform
 
       - name: Validar Terraform
         run: terraform validate
-        working-directory: ./terraform
+        working-directory: terraform
 
-      - name: Escaneo de Seguridad con Checkov
-        uses: bridgecrewio/checkov-action@master
+      - name: Configurar Python
+        uses: actions/setup-python@v5
         with:
-          directory: terraform/
-          framework: terraform
-          soft_fail: false
+          python-version: "3.12"
 
-      - name: Configurar Credenciales de AWS
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+      - name: Instalar Checkov
+        run: python -m pip install checkov
 
-      - name: Aplicar Cambios en Terraform
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve
-        working-directory: ./terraform
+      - name: Revisar seguridad
+        run: checkov -d terraform --framework terraform
